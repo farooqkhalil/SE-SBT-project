@@ -15,8 +15,9 @@ public class Var implements BooleanExpression {
     }
 
     @Override
-    public String toPosFixString() {
-        return  this.toString().replaceAll("\\s{2,}", " ");
+    public String toPostfixString() {
+        String result = this.getName().trim().replaceAll("\\s{2,}", " ");
+        return result;
     }
 
     @Override

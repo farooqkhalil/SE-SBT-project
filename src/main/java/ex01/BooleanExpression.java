@@ -4,14 +4,14 @@ import java.util.*;
 
 public interface BooleanExpression {
 
-    public String toPosFixString();
+    public String toPostfixString();
 
     public Boolean evaluate(Map<String, Boolean> map);
 
     public BooleanExpression toDNF();
 
-    public default List<BooleanExpression> disjunctiveTerms(){
-        List<BooleanExpression> list = Arrays.asList(this);
+    public default ArrayList<BooleanExpression> disjunctiveTerms(){
+        ArrayList<BooleanExpression> list = new ArrayList<>(Arrays.asList(this));
         return list;
     }
 
@@ -24,42 +24,34 @@ public interface BooleanExpression {
         for (int i = 0; i < chars.length; i++) {
 
             char ch = chars[i];
-            BooleanExpression left;
-            BooleanExpression right;
             BooleanExpression op;
 
             switch (ch) {
                 case ' ':
                     break;
                 case '&':
-                    try {
-                        right = stack.pop();
-                        left = stack.pop();
-                    } catch (IllegalArgumentException ex) {
-                        throw ex;
-                    }
-                    And and = new And(left, right);
-                    stack.push(and);
+                    setLeftAndRightOp(stack,"And");
                     break;
-                case '|':
-                    try {
-                        right = stack.pop();
-                        left = stack.pop();
-                    } catch (IllegalArgumentException ex) {
-                        throw ex;
-                    }
 
-                    Or or = new Or(left, right);
-                    stack.push(or);
+                case '|':
+                    setLeftAndRightOp(stack, "Or");
                     break;
+
                 case '!':
                     try {
-                        op = stack.pop();
+                        if(stack.size()>0){
+                            op = stack.pop();
+                        }
+                        else{
+                            throw new IllegalArgumentException();
+                        }
                     } catch (IllegalArgumentException ex) {
                         throw ex;
                     }
                     Not not = new Not(op);
+                    stack.push(not);
                     break;
+
                 default:
                     StringBuilder sb = new StringBuilder();
                     i = findNextSpaceCharAndBuildString(chars, i, sb);
@@ -95,5 +87,21 @@ public interface BooleanExpression {
             }
         }
         return c;
+    }
+
+    public static void setLeftAndRightOp(Stack<BooleanExpression> stack, String operation){
+        try {
+            if(stack.size()<2){
+                throw new IllegalArgumentException();
+            }
+            else{
+                BooleanExpression right = stack.pop();
+                BooleanExpression left = stack.pop();
+                BooleanExpression booleanExpression = (operation=="And")? new And(left,right): new Or(left,right);
+                stack.push(booleanExpression);
+            }
+        } catch (IllegalArgumentException ex) {
+            throw ex;
+        }
     }
 }

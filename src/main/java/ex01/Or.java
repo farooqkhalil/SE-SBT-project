@@ -1,6 +1,7 @@
 package ex01;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,14 @@ public class Or implements BooleanExpression {
     }
 
     @Override
-    public String toPosFixString() {
-        return  this.toString().replaceAll("\\s{2,}", " ");    }
+    public String toPostfixString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(leftOp.toPostfixString()+" ");
+        sb.append(rightOp.toPostfixString()+" ");
+        sb.append("| ");
+        String result = sb.toString().trim().replaceAll("\\s{2,}", " ");
+        return result;
+    }
 
     @Override
     public Boolean evaluate(Map<String, Boolean> map) {
@@ -40,10 +47,11 @@ public class Or implements BooleanExpression {
     }
 
     @Override
-    public List<BooleanExpression> disjunctiveTerms() {
+    public ArrayList<BooleanExpression> disjunctiveTerms() {
         if(this.leftOp instanceof Or || this.rightOp instanceof Or){
-            List<BooleanExpression> list = this.leftOp.disjunctiveTerms();
-            list.addAll(this.rightOp.disjunctiveTerms());
+            ArrayList<BooleanExpression> list = this.leftOp.disjunctiveTerms();
+            ArrayList<BooleanExpression> newList = this.rightOp.disjunctiveTerms();
+            list.addAll(newList);
             return list;
         }
         /*else if(this.leftOp instanceof Or && !(this.rightOp instanceof Or)){
@@ -58,7 +66,8 @@ public class Or implements BooleanExpression {
 
         }*/
         else {
-            return Arrays.asList(leftOp, rightOp);
+            ArrayList<BooleanExpression> list = new ArrayList<>(Arrays.asList(leftOp, rightOp));
+            return list;
         }
     }
 }

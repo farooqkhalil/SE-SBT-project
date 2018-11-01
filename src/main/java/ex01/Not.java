@@ -15,8 +15,12 @@ public class Not implements BooleanExpression {
     }
 
     @Override
-    public String toPosFixString() {
-        return  this.toString().replaceAll("\\s{2,}", " ");
+    public String toPostfixString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(op.toPostfixString()+" ");
+        sb.append("! ");
+        String result = sb.toString().trim().replaceAll("\\s{2,}", " ");
+        return result;
     }
 
     @Override
